@@ -1,0 +1,14 @@
+{
+  "name": "slicer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mesh.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  }
+}
