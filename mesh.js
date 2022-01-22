@@ -1,4 +1,3 @@
-import { mat4 } from './node_modules/gl-matrix/esm/index.js';
 export class Mesh {
     constructor(vertices, faces, normals) {
         this.vertices = vertices;
@@ -21,6 +20,8 @@ export class Mesh {
             this.glData.initialized = true;
             this.glData.dataBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, this.glData.dataBuffer);
+            gl.enableVertexAttribArray(vertexPositionAttribute);
+            gl.enableVertexAttribArray(vertexNormalAttribute);
             this.glData.dataFloat32Array = new Float32Array(this.faces.length * 6 * 3);
             for (let i = 0; i < this.faces.length; i++) {
                 for (let j = 0; j < 3; j++) {
@@ -37,8 +38,9 @@ export class Mesh {
             gl.bufferData(gl.ARRAY_BUFFER, this.glData.dataFloat32Array, gl.STATIC_DRAW);
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.glData.dataBuffer);
-        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 6 * 3 * 4, 0);
-        gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 6 * 3 * 4, 3 * 4);
+        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 6 * 4, 0);
+        gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
         gl.drawArrays(gl.TRIANGLES, 0, this.faces.length * 3);
+        console.log('count=' + this.faces.length * 3);
     }
 }

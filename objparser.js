@@ -3,10 +3,12 @@ import { Mesh } from './mesh.js';
 export async function parseObj(url) {
     let response = await fetch(url);
     let text = await response.text();
+    text = text.trim();
     let lines = text.split('\n');
     let vertices = [];
     let faces = [];
     let normals = [];
+    let unsupportedDeclarations = [];
     for (let currentLineNumber = 0; currentLineNumber < lines.length; currentLineNumber++) {
         let line = lines[currentLineNumber];
         line = line.trim();
@@ -25,10 +27,10 @@ export async function parseObj(url) {
                 let vertexIndex = parseInt(indices[0]) - 1;
                 let normalIndex = parseInt(indices[2]) - 1;
                 if (normalIndex > normals.length) {
-                    console.warn('[objparser] ' + url + ':' + currentLineNumber + ' Normal index out of bounds: ' + normalIndex + ' (max: ' + normals.length + ')');
+                    console.warn('[objparser] ' + (url.startsWith('data:') ? url.slice(0, 50) + (url.length > 50 ? '...' : '') : url) + ':' + currentLineNumber + ' Normal index out of bounds: ' + normalIndex + ' (max: ' + normals.length + ')');
                 }
                 if (vertexIndex > vertices.length) {
-                    console.warn('[objparser] ' + url + ':' + currentLineNumber + ' Vertex index out of bounds: ' + vertexIndex + ' (max: ' + vertices.length + ')');
+                    console.warn('[objparser] ' + (url.startsWith('data:') ? url.slice(0, 50) + (url.length > 50 ? '...' : '') : url) + ':' + currentLineNumber + ' Vertex index out of bounds: ' + vertexIndex + ' (max: ' + vertices.length + ')');
                 }
                 face.push(vertices[vertexIndex]);
                 faceNormals.push(normals[normalIndex]);
@@ -41,10 +43,12 @@ export async function parseObj(url) {
             let normal = new Vector(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3]));
             normals.push(normal.normalize());
         } else {
-            console.warn('[objparser] ' + url + ':' + currentLineNumber + ' Unsupported declaration: ' + parts[0]);
+            if (unsupportedDeclarations.indexOf(parts[0]) === -1) {
+                console.warn('[objparser] ' + (url.startsWith('data:') ? url.slice(0, 50) + (url.length > 50 ? '...' : '') : url) + ':' + currentLineNumber + ' Unsupported declaration: ' + parts[0]);
+                unsupportedDeclarations.push(parts[0]);
+            }
         }
     }
     let mesh = new Mesh(vertices, faces, normals);
-    mesh.draw(null, 0, 0);
     return mesh;
 }
