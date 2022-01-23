@@ -111,4 +111,14 @@ export class Vector {
         let det = b_.x * (c_.y * x_.z - c_.z * x_.y) - b_.y * (c_.x * x_.z - c_.z * x_.x) + b_.z * (c_.x * x_.y - c_.y * x_.x);
         return det < 0 ? -1 : det > 0 ? 1 : 0;
     }
+
+    /** @param {Vector} other */
+    distanceTo(other) {
+        return this.substract(other).magnitude();
+    }
+
+    /** @param {Vector} other */
+    sqrDistanceTo(other) {
+        return this.substract(other).sqrMagnitude();
+    }
 }

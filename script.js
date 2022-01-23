@@ -1,5 +1,7 @@
 import { parseObj } from './objparser.js';
 import { mat4 } from './node_modules/gl-matrix/esm/index.js';
+import { Ray } from './ray.js';
+import { Vector } from './vector.js';
 
 /** @type {HTMLInputElement} */
 const fileInput = document.getElementById('file');
@@ -116,6 +118,8 @@ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 function process(url) {
     parseObj(url).then(mesh => {
         console.log('mesh', mesh);
+        let ray = new Ray(new Vector(0, 10, 0), new Vector(0, -1, 0), mesh, 10);
+        ray.trace();
         if (useWebGL) {
             gl.clearColor(50 / 255, 168 / 255, 227 / 255, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

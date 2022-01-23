@@ -1,4 +1,10 @@
+import { Vector } from './vector.js';
 export class Mesh {
+    /**
+     * @param {Vector} vertices
+     * @param {Vector} normals
+     * @param {{vertices: [Vector, Vector, Vector], normals: [Vector, Vector, Vector]}[]} faces
+     */
     constructor(vertices, faces, normals) {
         this.vertices = vertices;
         this.faces = faces;
