@@ -9,7 +9,7 @@ export class Ray {
      */
     constructor(origin, direction, mesh, maxDistance) {
         this.origin = origin;
-        this.direction = direction.normalize().multiply(0.01);
+        this.direction = direction.normalize().multiplyScalar(0.01);
         this.position = origin.addScalar(0);
         this.mesh = mesh;
         this.sqrMaxDistance = maxDistance * maxDistance;
@@ -25,13 +25,13 @@ export class Ray {
         while (this.origin.sqrDistanceTo(this.position) < this.sqrMaxDistance) {
             this.position = this.position.add(this.direction);
             let sides = this.mesh.faces.map(face => {
-                let side = this.origin.getSideOfPlane(face.vertices[0], face.vertices[1], face.vertices[2]);
+                let side = this.position.getSideOfPlane(face.vertices[0], face.vertices[1], face.vertices[2]);
                 return side;
             });
             for (let i = 0; i < sides.length; i++) {
                 if (this.sides[i] != sides[i]) {
                     let opposite = this.direction.multiplyScalar(-0.1);
-                    while (this.origin.getSideOfPlane(this.mesh.faces[i].vertices[0], this.mesh.faces[i].vertices[1], this.mesh.faces[i].vertices[2]) != this.sides[i]) {
+                    while (this.position.getSideOfPlane(this.mesh.faces[i].vertices[0], this.mesh.faces[i].vertices[1], this.mesh.faces[i].vertices[2]) != this.sides[i]) {
                         this.position = this.position.add(opposite);
                     }
                     this.position = this.position.add(this.direction.multiplyScalar(0.1));
@@ -78,6 +78,7 @@ export class Ray {
                         let distanceFromOrigin = this.position.distanceTo(this.origin);
                         this.states.push([distanceFromOrigin, this.state]);
                     }
+                    console.log('meow');
                 }
             }
             this.sides = sides;

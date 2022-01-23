@@ -96,34 +96,59 @@ const normalAttributeLocation = gl.getAttribLocation(program, 'a_normal');
 const matrixUniformLocation = gl.getUniformLocation(program, 'u_matrix');
 const lightUniformLocation = gl.getUniformLocation(program, 'u_light');
 
-
-const projectionMatrix = mat4.create();
-const viewMatrix = mat4.create();
-
-mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
-mat4.lookAt(viewMatrix, [0, 3, -10], [0, 0, 0], [0, 1, 0]);
-
-const resultMatrix = mat4.create();
-mat4.multiply(resultMatrix, projectionMatrix, viewMatrix);
-
 gl.useProgram(program);
 gl.uniform3f(lightUniformLocation, 0, 3, -10);
-gl.uniformMatrix4fv(matrixUniformLocation, false, resultMatrix);
 gl.viewport(0, 0, canvas.width, canvas.height);
 gl.enable(gl.DEPTH_TEST);
 // gl.enable(gl.CULL_FACE);
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+let currentMesh = null;
+let view = [0, 3, -10];
+
+function draw() {
+    const projectionMatrix = mat4.create();
+    const viewMatrix = mat4.create();
+
+    mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+    mat4.lookAt(viewMatrix, view, [0, 0, 0], [0, 1, 0]);
+
+    const resultMatrix = mat4.create();
+    mat4.multiply(resultMatrix, projectionMatrix, viewMatrix);
+    gl.uniformMatrix4fv(matrixUniformLocation, false, resultMatrix);
+    gl.clearColor(50 / 255, 168 / 255, 227 / 255, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    currentMesh.draw(gl, positionAttributeLocation, normalAttributeLocation);
+}
+
+addEventListener('keydown', e => {
+    let key = e.key.toLowerCase();
+    if (key == 'w') {
+        view[2] += 1;
+    } else if (key == 's') {
+        view[2] -= 1;
+    } else if (key == 'a') {
+        view[0] -= 1;
+    } else if (key == 'd') {
+        view[0] += 1;
+    } else if (key == 'q') {
+        view[1] -= 1;
+    } else if (key == 'e') {
+        view[1] += 1;
+    }
+    draw();
+});
 function process(url) {
     parseObj(url).then(mesh => {
         console.log('mesh', mesh);
-        let ray = new Ray(new Vector(0, 10, 0), new Vector(0, -1, 0), mesh, 10);
-        ray.trace();
+        let ray = new Ray(new Vector(0.01, 5, 0), new Vector(0, -1, 0), mesh, 10);
+        // ray.trace();
+        console.log('ray', ray);
         if (useWebGL) {
-            gl.clearColor(50 / 255, 168 / 255, 227 / 255, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            mesh.draw(gl, positionAttributeLocation, normalAttributeLocation);
+            currentMesh = mesh;
+            view = [0, 3, -10];
+            draw();
             console.log('done');
         }
     });
